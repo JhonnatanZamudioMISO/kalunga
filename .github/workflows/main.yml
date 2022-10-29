@@ -22,15 +22,6 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and Test
-        uses: ./.github/actions/build
-
-      - name: Upload Unit Tests Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit-test-report
-          path: "app/build/reports/tests/testDebugUnitTest/"
-
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport
 
