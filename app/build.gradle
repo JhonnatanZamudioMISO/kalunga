@@ -8,6 +8,16 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
     jacoco.excludes = ['jdk.internal.*']
@@ -19,7 +29,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
 
     reports {
         xml.required = true
-        xml.destination = file("build/reports/jacoco/test/jacocoTestReport.xml")
+        //xml.destination = file("build/reports/jacoco/test/jacocoTestReport.xml")
         html.required = true
     }
 
@@ -77,9 +87,19 @@ android {
     }
 
     testOptions {
-        unitTests.includeAndroidResources = true
-        unitTests.returnDefaultValues = true
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+                jacoco.excludes = ['jdk.internal.*']
+            }
+        }
+
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
     }
+
 
     sourceSets {
         main {
