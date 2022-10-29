@@ -1,86 +1,46 @@
-name: CI Kalunga
+name: Sonar CI - Kalunga
+
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
 
 jobs:
-
-  unit-test:
-    runs-on: ubuntu-latest
+  build-and-scan:
+    runs-on: macos-latest
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v2
-        
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
-
-      - name: Run tests
-        run: ./gradlew jacocoTestReport
-        
-      - name: Upload xml Jacoco test report
-        uses: actions/upload-artifact@v2
+      - name: Checkout Files
+        uses: actions/checkout@v3
         with:
-          name: jacocoTestReport.xml
-          path: build/reports/jacoco/test/jacocoTestReport.xml
+          fetch-depth: 0
           
-      - name: Validar resultado error
-        if: ${{ failure() }}
-        env:
-         MENSAJE_ERROR: No se puede realizar el merge porque FALLO una o más pruebas unitarias
-        run: echo "::set-output name=respuesta::${MENSAJE_ERROR}"
-        
-      - name: Validar resultado exitoso
-        if: ${{ success() }}
-        env:
-          MENSAJE_EXITO: El resultado de las pruebas unitarias fue exitoso
-        run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
-            
-  static-code-analysis:
-    needs: [unit-test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v2
-        
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
-
+        
       - name: set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-          
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-          
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_CI }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonarqube --info
 
-      - name: Validar resultado error
-        if: ${{ failure() }}
+      - name: Generate Coverage Report
+        run: ./gradlew jacocoTestReport
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: "app/build/reports/jacoco/jacocoTestReport/html/"
+
+      - name: Sonarscan
+        run: ./gradlew sonarqube
         env:
-         MENSAJE_ERROR: No se puede realizar el merge porque FALLO la revisión de código estático
-        run: echo "::set-output name=respuesta::${MENSAJE_ERROR}"
-        
-      - name: Validar resultado exitoso
-        if: ${{ success() }}
-        env:
-          MENSAJE_EXITO: El resultado del análisis estático fue exitoso
-        run: echo "::set-output name=respuesta::${MENSAJE_EXITO}"
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_CI }}
