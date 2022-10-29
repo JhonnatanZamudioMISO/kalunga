@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jacocoTestReport.xml
-          path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          path: build/reports/jacoco/test/jacocoTestReport.xml
           
       - name: Validar resultado error
         if: ${{ failure() }}
