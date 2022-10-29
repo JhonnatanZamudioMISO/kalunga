@@ -33,6 +33,12 @@ class SignUpUseCase {
         return email == 1 && name == 1 && password == 1 && confirmPassword == 1
     }
 
+    fun testingQAChangeEnableButton(
+        email: Int, name: Int, password: Int, confirmPassword: Int,
+    ): Boolean {
+        return email == 1 && name == 1 && password == 1 && confirmPassword == 1
+    }
+
     fun isNumberPair(number: Int): Boolean {
         return number % 2 == 0
     }
