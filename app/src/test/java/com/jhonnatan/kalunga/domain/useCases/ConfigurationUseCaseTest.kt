@@ -24,12 +24,10 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.jhonnatan.kalunga.domain.models.enumeration.CodeStatusUser
 import com.jhonnatan.kalunga.domain.models.utils.UtilsCountry
 import com.jhonnatan.kalunga.domain.useCases.utils.Countries
 import com.jhonnatan.kalunga.domain.useCases.utils.DataPools
 import com.jhonnatan.kalunga.domain.useCases.utils.TypesDocument
-import com.jhonnatan.kalunga.domain.useCases.utils.Users
 
 /**
  * Project: kalunga
